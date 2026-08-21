@@ -1,8 +1,10 @@
 # DoDuyTTS 🌍
 
-DoDuyTTS is a massively multilingual zero-shot text-to-speech (TTS) model supporting 600+ languages. Built on a diffusion language model-style architecture, it generates high-quality speech with fast inference, supporting voice cloning and voice design.
+DoDuyTTS is a massively multilingual zero-shot text-to-speech (TTS) model supporting 600+ languages. Built on a diffusion language model-style architecture, it generates high-quality speech with fast inference, supporting voice cloning and voice design. It ships with a streaming TTS server that speaks LLM output sentence-by-sentence as it is generated.
 
-**Contents**: [Key Features](#key-features) | [Installation](#installation) | [Quick Start](#quick-start) | [Python API](#python-api) | [Command-Line Tools](#command-line-tools) | [Disclaimer](#disclaimer)
+**Model checkpoint**: [doduy1911/dodduyTTS](https://huggingface.co/doduy1911/dodduyTTS) on Hugging Face (downloaded automatically on first run).
+
+**Contents**: [Key Features](#key-features) | [Installation](#installation) | [Quick Start](#quick-start) | [Python API](#python-api) | [Command-Line Tools](#command-line-tools) | [Streaming TTS Server](#streaming-tts-server) | [Acknowledgements](#acknowledgements) | [Disclaimer](#disclaimer)
 
 ## Key Features
 
@@ -12,12 +14,20 @@ DoDuyTTS is a massively multilingual zero-shot text-to-speech (TTS) model suppor
 - **Auto Voice**: let the model pick a voice automatically.
 - **Fine-grained Control**: non-verbal symbols (e.g. `[laughter]`) and pronunciation correction via pinyin or phonemes.
 - **Fast Inference**: RTF as low as 0.025 (~40x faster than real-time), with optional [FlashInfer](#flashinfer-acceleration) acceleration on NVIDIA GPUs.
+- **Streaming Server**: [`doduytts-serve`](#streaming-tts-server) turns streaming LLM text into speech in real time — incremental sentence chunking + dynamic micro-batching (~200 ms per sentence on an RTX 4090).
 
 ---
 
 ## Installation
 
-Requires Python >= 3.10. Choose **one** of the following methods.
+Requires Python >= 3.10.
+
+```bash
+git clone https://github.com/doduy1911/dodduyTTS.git
+cd dodduyTTS
+```
+
+Then choose **one** of the following methods.
 
 ### uv (recommended)
 
@@ -87,16 +97,18 @@ Then either launch the web demo or run a single inference from the command line:
 
 ```bash
 # Web UI (voice cloning + voice design)
-doduytts-demo --ip 0.0.0.0 --port 8001
+doduytts-demo --ip 0.0.0.0 --port 7860
+
+# Streaming TTS server (LLM text in, audio out)
+doduytts-serve --port 8001
 
 # Single-item inference, auto voice, saved to outputs/hello.wav
 doduytts-infer \
-    --model doduy1911/dodduyTTS \
     --text "Hello, this is a test of text to speech." \
     --output outputs/hello.wav
 ```
 
-`--model` accepts a HuggingFace repo id (downloaded and cached automatically) or a local checkpoint directory. If you have trouble reaching HuggingFace, set `export HF_ENDPOINT="https://hf-mirror.com"` before running.
+All commands default to the [doduy1911/dodduyTTS](https://huggingface.co/doduy1911/dodduyTTS) checkpoint; `--model` also accepts another HuggingFace repo id or a local checkpoint directory. If you have trouble reaching HuggingFace, set `export HF_ENDPOINT="https://hf-mirror.com"` before running.
 
 Device is auto-detected (`cuda` > `xpu` > `mps` > `cpu`); override with `--device`.
 
@@ -134,7 +146,7 @@ audio = model.generate(text="This is a sentence without any voice prompt.")
 sf.write("out.wav", audio[0], 24000)  # audio[0] is np.ndarray, shape (T,), 24 kHz
 ```
 
-**Useful `generate()` options**: `num_step` (diffusion steps, default 32; try 16 for faster inference), `speed`, `duration` (fixed output length, overrides `speed`), `normalize_text=True` (requires the `tn` extra).
+**Useful `generate()` options**: `num_step` (diffusion steps, default 32; 8 is ~4x faster with quality that holds up well in practice — the streaming server defaults to 8), `speed`, `duration` (fixed output length, overrides `speed`), `normalize_text=True` (requires the `tn` extra).
 
 ### Reusing a cloned voice across sessions
 
@@ -179,9 +191,12 @@ doduytts-infer-batch \
 
 ```bash
 doduytts-serve --port 8001                 # real model (auto device)
+doduytts-serve --port 8001 --flashinfer    # + FlashInfer acceleration (NVIDIA GPU)
 doduytts-serve --port 8001 --mock          # pipeline test without weights
-doduytts-serve --num-step 32 --max-batch 4 --window-ms 20
+doduytts-serve --num-step 16 --max-batch 4 --window-ms 20   # tuning knobs
 ```
+
+Measured per-sentence latency (num_step=8): **~200 ms** on RTX 4090 with `--flashinfer` (a batch of 4 sentences costs about the same as 1), ~1–3 s on Apple Silicon (MPS).
 
 - **WebSocket `/ws/tts`** — send `{"type":"config", "instruct"|"language"|"ref_audio"+"ref_text": ...}` once (optional), then `{"type":"delta","text":...}` per LLM token, then `{"type":"end"}`. The server replies with `sentence` events as sentences are detected and ordered `audio` events (base64 WAV, 24 kHz).
 - **SSE `GET /demo/stream?text=...&delay_ms=25`** — self-contained demo driven by a simulated LLM token stream.
@@ -204,6 +219,12 @@ pip install flashinfer-python==0.6.15.post1 "flashinfer-jit-cache==0.6.15.post1+
 doduytts-infer-batch --model doduy1911/dodduyTTS --test_list test.jsonl --res_dir results/ \
     --batch_size 8 --enable_flashinfer true
 ```
+
+---
+
+## Acknowledgements
+
+DoDuyTTS is based on [OmniVoice](https://huggingface.co/k2-fsa/OmniVoice) by the Xiaomi AI Lab Next-gen Kaldi team, used and redistributed under the [Apache License 2.0](LICENSE). All credit for the model architecture and training goes to the original authors.
 
 ---
 
