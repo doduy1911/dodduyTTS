@@ -22,29 +22,24 @@ DoDuyTTS is a massively multilingual zero-shot text-to-speech (TTS) model suppor
 
 Requires Python >= 3.10.
 
+### From PyPI (recommended)
+
+```bash
+pip install dodduyTTS        # or: uv add dodduytts
+```
+
+That's it — all CLI tools (`doduytts-serve`, `doduytts-demo`, ...) and the Python API are ready to use. The model checkpoint is downloaded automatically from [doduy1911/dodduyTTS](https://huggingface.co/doduy1911/dodduyTTS) on first run.
+
+### From source (for development)
+
 ```bash
 git clone https://github.com/doduy1911/dodduyTTS.git
 cd dodduyTTS
-```
 
-Then choose **one** of the following methods.
-
-### uv (recommended)
-
-```bash
-uv sync
+uv sync                      # or: pip install -e .
 ```
 
 > Tip: use a mirror with `uv sync --default-index "https://mirrors.aliyun.com/pypi/simple"`
-
-### pip
-
-```bash
-python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
-
-pip install -e .
-```
 
 **GPU-specific PyTorch** (installed automatically by the steps above on CPU/Apple Silicon; for CUDA or Intel Arc, install PyTorch first):
 
@@ -78,10 +73,12 @@ Requires the [Intel GPU driver](https://dgpu-docs.intel.com/driver/installation.
 ### Optional extras
 
 ```bash
-pip install -e ".[tn]"     # text normalization (numbers, dates, currency)
-pip install -e ".[lora]"   # LoRA finetuning / adapter loading
-pip install -e ".[eval]"   # WER / speaker-similarity evaluation tools
+pip install "dodduyTTS[tn]"     # text normalization (numbers, dates, currency)
+pip install "dodduyTTS[lora]"   # LoRA finetuning / adapter loading
+pip install "dodduyTTS[eval]"   # WER / speaker-similarity evaluation tools
 ```
+
+(From a source checkout, use `pip install -e ".[tn]"` etc.)
 
 ---
 
