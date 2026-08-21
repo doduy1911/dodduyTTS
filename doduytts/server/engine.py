@@ -21,7 +21,7 @@ logger = logging.getLogger("doduytts.server")
 class TTSEngine:
     def __init__(
         self,
-        model_path: str = "k2-fsa/OmniVoice",
+        model_path: str = "doduy1911/dodduyTTS",
         device: Optional[str] = None,
         num_step: int = 8,
         flashinfer: bool = False,

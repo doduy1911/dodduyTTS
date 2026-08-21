@@ -39,7 +39,7 @@ logger = logging.getLogger("doduytts.server")
 
 @dataclass
 class Settings:
-    model: str = "k2-fsa/OmniVoice"
+    model: str = "doduy1911/dodduyTTS"
     device: str | None = None
     num_step: int = 8
     max_batch_size: int = 4
@@ -262,7 +262,7 @@ def main():
     parser = argparse.ArgumentParser(description="DoDuyTTS streaming TTS server")
     parser.add_argument("--ip", default="0.0.0.0")
     parser.add_argument("--port", type=int, default=8001)
-    parser.add_argument("--model", default="k2-fsa/OmniVoice")
+    parser.add_argument("--model", default="doduy1911/dodduyTTS")
     parser.add_argument("--device", default=None, help="cuda | xpu | mps | cpu (auto)")
     parser.add_argument("--num-step", type=int, default=8,
                         help="diffusion steps (8 = fast, 32 = best quality)")

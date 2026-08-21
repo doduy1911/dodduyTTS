@@ -91,7 +91,7 @@ doduytts-demo --ip 0.0.0.0 --port 8001
 
 # Single-item inference, auto voice, saved to outputs/hello.wav
 doduytts-infer \
-    --model k2-fsa/OmniVoice \
+    --model doduy1911/dodduyTTS \
     --text "Hello, this is a test of text to speech." \
     --output outputs/hello.wav
 ```
@@ -110,7 +110,7 @@ import soundfile as sf
 import torch
 
 model = DoDuyTTS.from_pretrained(
-    "k2-fsa/OmniVoice",
+    "doduy1911/dodduyTTS",
     device_map="cuda:0",   # or "mps" (Apple Silicon), "xpu" (Intel Arc), "cpu"
     dtype=torch.float16,
 )
@@ -166,7 +166,7 @@ Run any command with `--help` for the full list of options.
 
 ```bash
 doduytts-infer-batch \
-    --model k2-fsa/OmniVoice \
+    --model doduy1911/dodduyTTS \
     --test_list test.jsonl \
     --res_dir results/
 ```
@@ -201,7 +201,7 @@ python examples/stream_client.py --concurrent 4
 pip install flashinfer-python==0.6.15.post1 "flashinfer-jit-cache==0.6.15.post1+cu128" \
     --extra-index-url https://flashinfer.ai/whl/cu128/
 
-doduytts-infer-batch --model k2-fsa/OmniVoice --test_list test.jsonl --res_dir results/ \
+doduytts-infer-batch --model doduy1911/dodduyTTS --test_list test.jsonl --res_dir results/ \
     --batch_size 8 --enable_flashinfer true
 ```
 

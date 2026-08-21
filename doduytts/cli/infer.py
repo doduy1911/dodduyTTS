@@ -5,17 +5,17 @@ voice design, or auto voice.
 
 Usage:
     # Voice cloning
-    doduytts-infer --model k2-fsa/OmniVoice \
+    doduytts-infer --model doduy1911/dodduyTTS \
         --text "Hello, this is a text for text-to-speech." \
         --ref_audio ref.wav --ref_text "Reference transcript." --output out.wav
 
     # Voice design
-    doduytts-infer --model k2-fsa/OmniVoice \
+    doduytts-infer --model doduy1911/dodduyTTS \
         --text "Hello, this is a text for text-to-speech." \
         --instruct "male, British accent" --output out.wav
 
     # Auto voice
-    doduytts-infer --model k2-fsa/OmniVoice \
+    doduytts-infer --model doduy1911/dodduyTTS \
         --text "Hello, this is a text for text-to-speech." --output out.wav
 """
 
@@ -37,7 +37,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--model",
         type=str,
-        default="k2-fsa/OmniVoice",
+        default="doduy1911/dodduyTTS",
         help="Model checkpoint path or HuggingFace repo id.",
     )
     parser.add_argument(
