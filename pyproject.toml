@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "doduytts"
-version = "0.2.1"
+name = "dodduyTTS"
+version = "0.3.0"
 description = "DoDuyTTS: Towards Omnilingual Zero-Shot Text-to-Speech with Diffusion Language Models"
 readme = "README.md"
 license = "Apache-2.0"
